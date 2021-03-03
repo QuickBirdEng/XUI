@@ -20,5 +20,12 @@ extension Binding {
         )
     }
 
+    public func `default`<Wrapped>(_ value: Wrapped) -> Binding<Wrapped> where Value == Wrapped? {
+        .init(
+            get: { self.wrappedValue ?? value },
+            set: { self.wrappedValue = $0 }
+        )
+    }
+
 }
 

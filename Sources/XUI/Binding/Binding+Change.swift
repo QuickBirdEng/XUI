@@ -54,10 +54,11 @@ extension Binding {
         )
     }
 
-    public func map<V>(get: @escaping (Value) -> V, set: @escaping (V) -> Value) -> Binding<V> {
+    public func map<V>(get: @escaping (Value) -> V,
+                       set: @escaping (inout Value, V) -> Void) -> Binding<V> {
         .init(
             get: { get(self.wrappedValue) },
-            set: { self.wrappedValue = set($0) }
+            set: { set(&self.wrappedValue, $0) }
         )
     }
 

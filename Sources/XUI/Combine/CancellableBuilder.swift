@@ -70,6 +70,10 @@ extension Cancellable {
 
 extension RangeReplaceableCollection where Element == AnyCancellable {
 
+    public init(@CancellableBuilder _ builder: () -> [AnyCancellable]) {
+        self.init(builder())
+    }
+
     /// This method can be used to store multiple `Cancellable` objects
     /// from different subscriptions in a collection of `AnyCancellable`.
     public mutating func insert(@CancellableBuilder _ builder: () -> [AnyCancellable]) {
@@ -79,6 +83,10 @@ extension RangeReplaceableCollection where Element == AnyCancellable {
 }
 
 extension Set where Element == AnyCancellable {
+
+    public init(@CancellableBuilder _ builder: () -> [AnyCancellable]) {
+        self.init(builder())
+    }
 
     /// This method can be used to store multiple `Cancellable` objects
     /// from different subscriptions in a set of `AnyCancellable`.

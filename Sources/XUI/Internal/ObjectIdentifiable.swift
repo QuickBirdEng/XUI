@@ -8,7 +8,11 @@
 
 struct ObjectIdentifiable: Identifiable {
 
+    // MARK: Stored Properties
+
     var id: ObjectIdentifier
+
+    // MARK: Initialization
 
     init(_ object: Any) {
         self.id = ObjectIdentifier(object as AnyObject)

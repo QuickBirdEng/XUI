@@ -8,6 +8,8 @@
 
 extension NavigationLink {
 
+    // MARK: Initialization
+
     public init<Model, _Destination: View>(
         model: Binding<Model?>,
         @ViewBuilder destination: (Model) -> _Destination,
