@@ -76,4 +76,27 @@ extension Binding {
         )
     }
 
+    public func onlySetOnChange(_ isEqual: @escaping (Value, Value) -> Bool) -> Binding {
+        .init(
+            get: { self.wrappedValue },
+            set: { newValue in
+                guard !isEqual(self.wrappedValue, newValue) else {
+                    return
+                }
+                self.wrappedValue = newValue
+            }
+        )
+    }
+
+    public func onlySetOnChange<V>(
+        of keyPath: KeyPath<Value, V>
+    ) -> Binding where V: Equatable {
+
+        onlySetOnChange { $0[keyPath: keyPath] == $1[keyPath: keyPath] }
+    }
+
+    public func onlySetOnChange() -> Binding where Value: Equatable {
+        onlySetOnChange(==)
+    }
+
 }
