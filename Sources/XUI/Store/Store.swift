@@ -9,7 +9,7 @@
 @propertyWrapper
 public struct Store<Model>: DynamicProperty {
 
-    // MARK: Nested types
+    // MARK: Nested Types
 
     @dynamicMemberLookup
     public struct Wrapper {
@@ -23,7 +23,7 @@ public struct Store<Model>: DynamicProperty {
 
     }
 
-    // MARK: Stored properties
+    // MARK: Stored Properties
 
     public let wrappedValue: Model
 

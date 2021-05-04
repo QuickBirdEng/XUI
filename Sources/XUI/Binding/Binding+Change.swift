@@ -54,10 +54,11 @@ extension Binding {
         )
     }
 
-    public func map<V>(get: @escaping (Value) -> V, set: @escaping (V) -> Value) -> Binding<V> {
+    public func map<V>(get: @escaping (Value) -> V,
+                       set: @escaping (inout Value, V) -> Void) -> Binding<V> {
         .init(
             get: { get(self.wrappedValue) },
-            set: { self.wrappedValue = set($0) }
+            set: { set(&self.wrappedValue, $0) }
         )
     }
 
@@ -73,6 +74,29 @@ extension Binding {
             get: { self.wrappedValue },
             set: { self.wrappedValue = map($0) }
         )
+    }
+
+    public func onlySetOnChange(_ isEqual: @escaping (Value, Value) -> Bool) -> Binding {
+        .init(
+            get: { self.wrappedValue },
+            set: { newValue in
+                guard !isEqual(self.wrappedValue, newValue) else {
+                    return
+                }
+                self.wrappedValue = newValue
+            }
+        )
+    }
+
+    public func onlySetOnChange<V>(
+        of keyPath: KeyPath<Value, V>
+    ) -> Binding where V: Equatable {
+
+        onlySetOnChange { $0[keyPath: keyPath] == $1[keyPath: keyPath] }
+    }
+
+    public func onlySetOnChange() -> Binding where Value: Equatable {
+        onlySetOnChange(==)
     }
 
 }
