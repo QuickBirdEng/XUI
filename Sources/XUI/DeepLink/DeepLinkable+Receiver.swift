@@ -12,11 +12,13 @@ extension DeepLinkable {
         as type: Receiver.Type,
         where filter: (Receiver) -> Bool = { _ in true }
     ) -> Receiver! {
-        firstReceiver(ofType: type, where: filter) { $0.children }
-            ?? firstReceiver(ofType: type, where: filter) {
-                Mirror(reflecting: $0)
-                    .values { $0 as? DeepLinkable }
-            }
+        var visited = Set<ObjectIdentifier>()
+        var stack = [DeepLinkable]()
+        return firstReceiver(
+            where: { ($0 as? Receiver).map(filter) ?? false },
+            visited: &visited,
+            stack: &stack
+        ) as? Receiver
     }
 
 }
@@ -25,26 +27,10 @@ extension DeepLinkable {
 
     // MARK: Helpers - DeepLink
 
-    private func firstReceiver<Receiver>(
-        ofType type: Receiver.Type,
-        where filter: (Receiver) -> Bool,
-        children: (DeepLinkable) -> [DeepLinkable]
-    ) -> Receiver? {
-        var visited = Set<ObjectIdentifier>()
-        var stack = [DeepLinkable]()
-        return firstReceiver(
-            where: { ($0 as? Receiver).map(filter) ?? false },
-            visited: &visited,
-            stack: &stack,
-            children: children
-        ) as? Receiver
-    }
-
     private func firstReceiver(
         where filter: (Any) -> Bool,
         visited: inout Set<ObjectIdentifier>,
-        stack: inout [DeepLinkable],
-        children: (DeepLinkable) -> [DeepLinkable]
+        stack: inout [DeepLinkable]
     ) -> Any? {
 
         visited.insert(ObjectIdentifier(self))
@@ -54,7 +40,7 @@ extension DeepLinkable {
         }
 
         stack.append(
-            contentsOf: children(self)
+            contentsOf: children
                 .filter { !visited.contains(ObjectIdentifier($0)) }
         )
 
@@ -64,16 +50,8 @@ extension DeepLinkable {
 
         stack.removeFirst()
         return next
-            .firstReceiver(where: filter, visited: &visited, stack: &stack, children: children)
+            .firstReceiver(where: filter, visited: &visited, stack: &stack)
     }
 
 }
 
-extension Mirror {
-
-    fileprivate func values<Value>(_ compactMap: (Any) -> Value?) -> [Value] {
-        children.compactMap { compactMap($0.value) }
-            + (superclassMirror?.values(compactMap) ?? [])
-    }
-
-}

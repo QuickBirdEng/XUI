@@ -7,14 +7,33 @@
 //
 
 public protocol DeepLinkable: AnyObject {
-    @DeepLinkableBuilder var children: [DeepLinkable] { get }
+    var children: [DeepLinkable] { get }
 }
 
 extension DeepLinkable {
 
-    @DeepLinkableBuilder
     public var children: [DeepLinkable] {
-        get {}
+        Mirror(reflecting: self)
+            .values(extractDeepLinkable)
+    }
+
+    private func extractDeepLinkable(from object: Any) -> DeepLinkable? {
+        if let value = object as? DeepLinkable {
+            return value
+        } else if let value = object as? DeepLinkableWrapper {
+            return extractDeepLinkable(from: value.content)
+        } else {
+            return nil
+        }
+    }
+
+}
+
+extension Mirror {
+
+    fileprivate func values<Value>(_ compactMap: (Any) -> Value?) -> [Value] {
+        children.compactMap { compactMap($0.value) }
+            + (superclassMirror?.values(compactMap) ?? [])
     }
 
 }
