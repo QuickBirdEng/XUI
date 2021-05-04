@@ -11,7 +11,7 @@
 ///
 /// Possible use case: Storing multiple cancellables in a collection
 /// without writing `.store(in:)` for each subscription separately.
-@_functionBuilder
+@resultBuilder
 public struct CancellableBuilder {
 
     public static func buildBlock(_ components: [Cancellable]...) -> [Cancellable] {
