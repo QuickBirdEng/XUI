@@ -7,7 +7,7 @@
 //
 
 @propertyWrapper
-public struct Store<Model>: DynamicProperty {
+public struct Store<Model>: DynamicProperty where Model: AnyObservableObject {
 
     // MARK: Nested types
 
@@ -40,13 +40,7 @@ public struct Store<Model>: DynamicProperty {
 
     public init(wrappedValue: Model) {
         self.wrappedValue = wrappedValue
-
-        if let objectWillChange = (wrappedValue as? AnyObservableObject)?.objectWillChange {
-            self.observableObject = .init(objectWillChange: objectWillChange.eraseToAnyPublisher())
-        } else {
-            assertionFailure("Only use the `Store` property wrapper with instances conforming to `AnyObservableObject`.")
-            self.observableObject = .empty()
-        }
+        self.observableObject = .init(objectWillChange: wrappedValue.objectWillChange.eraseToAnyPublisher())
     }
 
     // MARK: Methods
