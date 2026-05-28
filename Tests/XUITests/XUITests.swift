@@ -7,8 +7,4 @@ final class XUITests: XCTestCase {
         // Use XCTAssert and related functions to verify your tests produce the correct
         // results.
     }
-
-    static var allTests = [
-        ("testExample", testExample),
-    ]
 }

@@ -6,6 +6,14 @@
 //  Copyright © 2021 QuickBird Studios. All rights reserved.
 //
 
+/// A coordinator-friendly `ViewModifier` that drives a sheet presentation off of a
+/// `Binding<Model?>`.
+///
+/// Non-nil `model` presents the sheet; setting `model` to nil (or the user dismissing the
+/// sheet interactively) dismisses it. The model should be a reference type — XUI identifies
+/// the presented item by object identity. The generic is unconstrained so that
+/// class-constrained protocol existentials can be passed; see `View.sheet(model:destination:)`
+/// for the detailed rationale.
 public struct SheetModifier<Model, Destination: View>: ViewModifier {
 
     // MARK: Stored Properties
@@ -16,16 +24,16 @@ public struct SheetModifier<Model, Destination: View>: ViewModifier {
     // MARK: Initialization
 
     public init(model: Binding<Model?>,
-                @ViewBuilder content: @escaping (Model) -> Destination) {
+                @ViewBuilder destination: @escaping (Model) -> Destination) {
 
         self.model = model
-        self.destination = content
+        self.destination = destination
     }
 
     // MARK: Methods
 
     public func body(content: Content) -> some View {
-        content.sheet(model: model, content: destination)
+        content.sheet(model: model, destination: destination)
     }
 
 }

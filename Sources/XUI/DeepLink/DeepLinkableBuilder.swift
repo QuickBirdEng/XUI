@@ -6,9 +6,12 @@
 //  Copyright © 2021 QuickBird Studios. All rights reserved.
 //
 
+/// Result builder used to assemble the `children` array of a `DeepLinkable`.
 public typealias DeepLinkableBuilder = CollectionBuilder<DeepLinkable>
 
-@_functionBuilder
+/// A generic result builder that collects `Component` values into an array, supporting
+/// `if`, `switch`, `for`, optional, and `#available` expressions inside the block.
+@resultBuilder
 public struct CollectionBuilder<Component> {
 
     public static func buildBlock(_ components: [Component]...) -> [Component] {

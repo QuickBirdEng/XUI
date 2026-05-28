@@ -8,23 +8,26 @@
 
 extension Publisher {
 
+    /// Converts the publisher into one that emits each output as `.success` and any failure
+    /// as a `.failure` value.
     ///
-    /// Maps the output and/or failure of a publisher to a `Result<Output, Failure>`
-    /// output without completing the publisher when receiving a failure.
-    ///
+    /// On upstream failure, the failure is delivered as a value (`.failure(...)`) and the
+    /// subscription then completes normally — i.e. the downstream is not torn down by a
+    /// Combine completion failure, but it still receives at most one trailing value before
+    /// completion.
+    @available(*, deprecated, message: "Prefer async/await with do/try/catch.")
     public func asResult() -> AnyPublisher<Result<Output, Failure>, Never> {
         map(Result<Output, Failure>.success)
             .catch { Just(.failure($0)) }
             .eraseToAnyPublisher()
     }
 
+    /// Reduces each output and any failure to values of a common type `Value`, using
+    /// separate closures for the success and failure cases.
     ///
-    /// Maps a given `Result` output to values of the same type with separate
-    /// closures for the success and failure case.
-    ///
-    /// Since errors are transformed into values, the publisher will no longer complete
-    /// when errors occur, but instead continue the subscription.
-    ///
+    /// On upstream failure, the failure is mapped through `failure` and emitted as a value;
+    /// the subscription then completes normally.
+    @available(*, deprecated, message: "Prefer async/await with do/try/catch.")
     public func mapResult<Value>(
         success: @escaping (Output) -> Value,
         failure: @escaping (Failure) -> Value) -> AnyPublisher<Value, Never> {
@@ -34,14 +37,9 @@ extension Publisher {
             .eraseToAnyPublisher()
     }
 
-    ///
-    /// Maps a given `Result` output to values of the same type with separate
-    /// closures for the success and failure case.
-    ///
-    /// Since errors are transformed into values, the publisher will no longer complete
-    /// when errors occur, but instead continue the subscription, unless the given closures
-    /// are throwing an error.
-    ///
+    /// Throwing variant of `mapResult(success:failure:)`. If either closure throws, the
+    /// resulting publisher fails with the thrown error.
+    @available(*, deprecated, message: "Prefer async/await with do/try/catch.")
     public func tryMapResult<Value>(
         success: @escaping (Output) throws -> Value,
         failure: @escaping (Failure) throws -> Value) -> AnyPublisher<Value, Error> {
@@ -55,8 +53,8 @@ extension Publisher {
 
 extension Result {
 
-    /// Maps a given `Result` to values of the same type with separate closures
-    /// for the success and failure case.
+    /// Reduces the `Result` to a single value of type `T` by applying either `successClosure`
+    /// or `failureClosure`.
     public func map<T>(success successClosure: (Success) throws -> T,
                        failure failureClosure: (Failure) throws -> T) rethrows -> T {
         switch self {
