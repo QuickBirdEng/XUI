@@ -2,7 +2,7 @@
 //  DeepLinkable.swift
 //  XUI
 //
-//  Created by Paul Kraft by 01.03.21.
+//  Created by Paul Kraft on 01.03.21.
 //  Copyright © 2021 QuickBird Studios. All rights reserved.
 //
 
