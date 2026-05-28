@@ -8,10 +8,25 @@
 
 extension DeepLinkable {
 
+    /// Searches the tree rooted at `self` for the first node of type `Receiver` that matches
+    /// `filter`, returning it or `nil` if no match is found.
+    ///
+    /// The search is breadth-first over `children`, with cycle protection. If the search via
+    /// `children` yields no match, a **second pass** uses Mirror reflection over each node's
+    /// stored properties to discover any `DeepLinkable`-conforming fields that were not
+    /// explicitly listed in `children`. This makes deep-link lookups work out of the box for
+    /// types that haven't bothered to override `children`, at the cost of also reaching
+    /// fields the author may not have intended to expose.
+    ///
+    /// - Parameters:
+    ///   - type: The target type to search for (often a view-model protocol).
+    ///   - filter: An optional predicate to further narrow the match. Defaults to accepting
+    ///     any value of `Receiver`.
+    /// - Returns: The first matching descendant, or `nil`.
     public func firstReceiver<Receiver>(
         as type: Receiver.Type,
         where filter: (Receiver) -> Bool = { _ in true }
-    ) -> Receiver! {
+    ) -> Receiver? {
         firstReceiver(ofType: type, where: filter) { $0.children }
             ?? firstReceiver(ofType: type, where: filter) {
                 Mirror(reflecting: $0)
